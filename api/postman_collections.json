@@ -1,0 +1,458 @@
+{
+  "info": {
+    "name": "UltraLearning API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Full UltraLearning API with updated URLs, authorization, tests and WebSocket usage doc."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "room_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth - Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"alice\",\n  \"role\": \"learner\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/register",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Get All Users",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/users",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "users"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Update User Role",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"role\": \"instructor\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/users/1",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "users", "1"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Delete User",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/users/1",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "users", "1"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"alice\",\n  \"password\": \"yourpassword\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": ["{{base_url}}"],
+          "path": ["auth", "login"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"access_token\", jsonData.access_token);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Flashcards - Create Pack",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Python Basics\",\n  \"owner_id\": 1,\n  \"description\": \"Introductory pack\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/flashcards/packs",
+          "host": ["{{base_url}}"],
+          "path": ["flashcards", "packs"]
+        }
+      }
+    },
+    {
+      "name": "Flashcards - List Packs",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/flashcards/packs",
+          "host": ["{{base_url}}"],
+          "path": ["flashcards", "packs"]
+        }
+      }
+    },
+    {
+      "name": "Flashcards - Update Pack",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Advanced Python Basics\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/flashcards/packs/1",
+          "host": ["{{base_url}}"],
+          "path": ["flashcards", "packs", "1"]
+        }
+      }
+    },
+    {
+      "name": "Flashcards - Delete Pack",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/flashcards/packs/1",
+          "host": ["{{base_url}}"],
+          "path": ["flashcards", "packs", "1"]
+        }
+      }
+    },
+    {
+      "name": "Flashcards - Create Flashcard",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"What is a list?\",\n  \"answer\": \"A collection of values\",\n  \"owner_id\": 1,\n  \"pack_id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/flashcards/flashcards",
+          "host": ["{{base_url}}"],
+          "path": ["flashcards", "flashcards"]
+        }
+      }
+    },
+    {
+      "name": "Flashcards - List Flashcards",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/flashcards/flashcards",
+          "host": ["{{base_url}}"],
+          "path": ["flashcards", "flashcards"]
+        }
+      }
+    },
+    {
+      "name": "Chat - Create Room",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"name\": \"Study Group\" }"
+        },
+        "url": {
+          "raw": "{{base_url}}/chat/rooms",
+          "host": ["{{base_url}}"],
+          "path": ["chat", "rooms"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));",
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"room_id\", jsonData.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat - List Rooms",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/chat/rooms",
+          "host": ["{{base_url}}"],
+          "path": ["chat", "rooms"]
+        }
+      }
+    },
+    {
+      "name": "Chat - Post Message and Get Bot Reply",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"Can you explain recursion?\",\n  \"role\": \"learner\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/chat/rooms/{{room_id}}/post_message",
+          "host": ["{{base_url}}"],
+          "path": ["chat", "rooms", "{{room_id}}", "post_message"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "var jsonData = pm.response.json();",
+              "pm.test('Response contains bot_reply', () => pm.expect(jsonData).to.have.property('bot_reply'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "WebSocket - Real-time Chat Usage Instructions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": ["{{base_url}}"],
+          "path": []
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Postman does not support WebSocket connections natively.",
+              "// Use a dedicated tool such as Insomnia, websocket.org Echo Test, or custom clients with Socket.IO support.",
+              "",
+              "// Example Socket.IO client Javascript snippet:",
+              "/*",
+              "const socket = io('{{base_url}}', {",
+              "  auth: { token: 'Bearer {{access_token}}' }",
+              "});",
+              "socket.on('connect', () => {",
+              "  console.log('Connected as', socket.id);",
+              "  socket.emit('join_room', { roomId: '{{room_id}}' });",
+              "  socket.emit('message', { content: 'Hello everyone!', roomId: '{{room_id}}' });",
+              "});",
+              "socket.on('message', (msg) => {",
+              "  console.log('New message:', msg);",
+              "});",
+              "*/"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gamification - Get User Score",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5001/gamification/score/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["gamification","score","1"]
+        }
+      }
+    },
+    {
+      "name": "Gamification - Add Points",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"user_id\": 1, \"points\": 100 }"
+        },
+        "url": {
+          "raw": "http://localhost:5001/gamification/add-points",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["gamification","add-points"]
+        }
+      }
+    },
+    {
+      "name": "Progress - Get User Progress",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5001/progress/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["progress","1"]
+        }
+      }
+    },
+    {
+      "name": "Progress - Create/Update User Progress",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 1,\n  \"current_level\": \"Intermediate\",\n  \"completed_lessons\": [\"pack1\", \"lesson2\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5001/progress",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["progress"]
+        }
+      }
+    },
+    {
+      "name": "Notifications - Create Notification",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 1,\n  \"message\": \"Time to review your flashcards!\",\n  \"notify_at\": null\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5001/notifications",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["notifications"]
+        }
+      }
+    },
+    {
+      "name": "Notifications - List User Notifications",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5001/notifications/user/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["notifications","user","1"]
+        }
+      }
+    },
+    {
+      "name": "Notifications - Mark Notification As Read",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "http://localhost:5001/notifications/mark-read/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["notifications","mark-read","1"]
+        }
+      }
+    },
+    {
+      "name": "Analytics - Get User Dashboard",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5001/analytics/dashboard/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["analytics", "dashboard", "1"]
+        }
+      }
+    }
+  ]
+}
+
