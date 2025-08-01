@@ -1,20 +1,34 @@
-from app.extensions import ma
-from .models import ChatRoom, ChatMessage
-from marshmallow import fields
+from marshmallow import Schema, fields, validate
 
-class ChatRoomSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = ChatRoom
-        load_instance = True
+class ChatRoomSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    description = fields.Str(missing='')
+    is_private = fields.Bool(missing=False)
+    created_by = fields.Int(dump_only=True)
+    created_at = fields.DateTime(dump_only=True)
 
+class ChatMessageSchema(Schema):
+    id = fields.Int(dump_only=True)
+    room_id = fields.Int(required=True)
+    sender_id = fields.Int(required=True)
+    content = fields.Str(required=True)
+    timestamp = fields.DateTime(dump_only=True)
 
-class ChatMessageSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = ChatMessage
-        # Optionally load instance to allow deserialization to ORM objects:
-        load_instance = True
-        include_fk = True  # to include foreign key fields like room_id, sender_id
+    role = fields.Str(
+        validate=validate.OneOf(['user', 'advisor', 'assistant', 'admin']),
+        load_default='user'
+    )
+    is_ai = fields.Bool(missing=False)
+    message_type = fields.Str(
+        validate=validate.OneOf(['text', 'transaction', 'alert', 'chart', 'system']),
+        missing='text'
+    )
+    status = fields.Str(missing='sent')
 
-    # Override or add fields if needed, like controlling serialization format
-    timestamp = fields.DateTime(format='iso')
+class ChatParticipantSchema(Schema):
+    id = fields.Int(dump_only=True)
+    room_id = fields.Int(required=True)
+    user_id = fields.Int(required=True)
+    joined_at = fields.DateTime(dump_only=True)
 

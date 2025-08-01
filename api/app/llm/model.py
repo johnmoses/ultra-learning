@@ -11,13 +11,21 @@ def get_llm():
     return _llm_instance
 
 
-def generate_response(prompt: str, max_tokens=512, temperature=0.7, top_p=0.9, stop_tokens=None):
+def generate_response(
+    messages: list,
+    max_tokens=512,
+    temperature=0.7,
+    top_p=0.9,
+    stop_tokens=None,
+):
     model = get_llm()
-    response = model(
-        prompt,
+    stop_tokens = stop_tokens or []
+
+    response = model.create_chat_completion(
+        messages=messages,
         max_tokens=max_tokens,
         temperature=temperature,
         top_p=top_p,
-        stop=stop_tokens or ["###", "</s>", "[/INST]"],
+        stop=stop_tokens,
     )
-    return response["choices"][0]["text"].strip()
+    return response["choices"][0]["message"]["content"].strip()
