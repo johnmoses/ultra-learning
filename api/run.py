@@ -3,35 +3,29 @@ import logging
 import os
 
 
-def setup_logging():
-    """Configure application logging"""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-    logging.getLogger('werkzeug').setLevel(logging.WARNING)
+# Configure root logger
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
+app = create_app()
+app.logger.setLevel(logging.INFO)
+logging.getLogger('werkzeug').setLevel(logging.INFO)  # HTTP request logs at INFO level
 
-def initialize_database(app):
-    """Initialize database tables"""
+if __name__ == '__main__':
     with app.app_context():
         try:
-            db.create_all()
-            app.logger.info("Database initialized successfully")
+            db.create_all()  # Create database tables if they don't exist
+            app.logger.info("Database tables created successfully")
         except Exception as e:
             app.logger.error(f"Database initialization failed: {e}")
             raise
 
-
-if __name__ == '__main__':
-    setup_logging()
-    app = create_app()
-    initialize_database(app)
-    
+    # Environment-based configuration
     debug_mode = os.getenv('FLASK_ENV') == 'development'
     port = int(os.getenv('PORT', 5001))
-    host = os.getenv('HOST', '0.0.0.0')
     
-    app.logger.info(f"Starting UltraLearning API on {host}:{port}")
-    socketio.run(app, host=host, port=port, debug=debug_mode)
+    app.logger.info(f"Starting UltraLearning API on port {port}")
+    socketio.run(app, host='0.0.0.0', port=port, use_reloader=False, debug=debug_mode)

@@ -21,11 +21,11 @@ llama_model = None
 embed_model = None
 _milvus_client = None
 
-db_path = "./milvus_learning.db"
-collection_name = "learning_documents"
+db_path = "./milvus_rag.db"
+collection_name = "ultra_learning_collection"
 embedding_dim = 384
 
-def init_llama_model(model_path: str, n_ctx: int = 4096, n_gpu_layers: int = 0, verbose: bool = False):
+def init_llama_model(model_path: str, n_ctx: int = 4096, n_gpu_layers: int = 0, n_threads: int = 4, use_mlock: bool = False, verbose: bool = False):
     """
     Initializes the global Llama model instance.
     Raises RuntimeError if initialization fails.
@@ -70,7 +70,7 @@ def init_milvus_client(db_path=db_path, collection=collection_name, dim=embeddin
         # Ensure directory exists
         pathlib.Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
-        _milvus_client = MilvusClient(db_path)
+        _milvus_client = MilvusClient(uri=db_path)
 
         try:
             _milvus_client.create_collection(
@@ -118,7 +118,7 @@ def insert_documents(docs: list, collection_name: str = None):
         
         new_doc = {
             "text": doc['text'],
-            "subject": doc.get('subject', 'general'), # Default to general category
+            "subject": doc.get('subject', 'general'), # Default subject if not provided
             "vector": doc_vector
         }
         # Only add 'id' if it's explicitly provided and not None, otherwise Milvus auto-generates
@@ -134,7 +134,7 @@ def search_vectors(query_embedding: list, top_k=5, filter_expr=None):
     """
     Search similar vectors.
     query_embedding: a single vector (list of floats) representing the query.
-    filter_expr: string filter expression, e.g. "subject == 'investment'"
+    filter_expr: string filter expression, e.g. "subject == 'history'"
     """
     global _milvus_client
     if _milvus_client is None:
@@ -145,7 +145,7 @@ def search_vectors(query_embedding: list, top_k=5, filter_expr=None):
         data=[query_embedding], # MilvusClient.search expects a list of query vectors
         filter=filter_expr,
         limit=top_k,
-        output_fields=["text", "subject", "id"]
+        output_fields=["text", "subject"]
     )
 
 def query_documents(filter_expr: str = None, collection_name: str = None):
@@ -159,7 +159,7 @@ def query_documents(filter_expr: str = None, collection_name: str = None):
     return client.query(
         collection_name=current_collection,
         filter=filter_expr,
-        output_fields=["text", "subject", "id"]
+        output_fields=["text", "subject"]
     )
 
 def delete_documents(filter_expr: str, collection_name: str = None):

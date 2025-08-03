@@ -11,16 +11,13 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)     # 7 days
     JWT_TOKEN_LOCATION = ['headers']
 
-    # AI/ML Configuration
-    MILVUS_DB_PATH = os.environ.get("MILVUS_DB_PATH", "./milvus_learning.db")
-    MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION", "learning_documents")
+    MILVUS_DB_PATH = os.environ.get("MILVUS_DB_PATH", "./milvus_rag.db")
+    MILVUS_COLLECTION = os.environ.get("MILVUS_COLLECTION", "ultra_learning_collection")
     MILVUS_DIMENSION = int(os.environ.get("MILVUS_DIMENSION", "384"))
     EMBED_MODEL_NAME = os.environ.get("EMBED_MODEL_NAME", "all-MiniLM-L6-v2")
-    LLAMA_MODEL_PATH = os.environ.get("LLAMA_MODEL_PATH")
+    TRANSFORMERS_NO_ADVISORY_WARNINGS = True
     
-    # Bot Configuration
-    BOT_PASSWORD = os.environ.get("BOT_PASSWORD", "secure_learning_bot_2024")
-    
-    # Learning Configuration
-    LLAMA_N_CTX = int(os.environ.get("LLAMA_N_CTX", "4096"))
-    LLAMA_N_GPU_LAYERS = int(os.environ.get("LLAMA_N_GPU_LAYERS", "0"))
+    LLAMA_MODEL_PATH = os.environ.get("LLAMA_MODEL_PATH", "/Users/johnmoses/.cache/lm-studio/models/MaziyarPanahi/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf")
+    # LLAMA_N_CTX = 2048  # Smaller context window for safety
+    # LLAMA_N_GPU_LAYERS = 0  # CPU only by default
+    # LLAMA_VERBOSE = True  # For debugging

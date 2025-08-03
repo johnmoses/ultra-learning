@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from app.extensions import (
     db,
@@ -8,20 +8,19 @@ from app.extensions import (
     socketio,
     ma,
     init_milvus_client, 
-    init_embed_model,
-    init_llama_model # Import the Llama initialization function
+    init_embed_model
 )
 from app.auth.models import User
-from app.learning.models import *
-from app.engagement.models import *
-from app.chat.models import *
-from app.dashboard.models import UserActivity
+# from app.learning.models import *
+# from app.engagement.models import *
+# from app.chat.models import *
+# from app.dashboard.models import UserActivity
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object("config.Config")
-    CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
+    CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
     # --- Initialize Flask extensions ---
     db.init_app(app)
@@ -58,20 +57,7 @@ def create_app():
         jti = jwt_payload["jti"]
         return jti in jwt_blacklist
     
-    # --- Error Handlers ---
-    @app.errorhandler(404)
-    def not_found(error):
-        return jsonify({"error": "Resource not found"}), 404
     
-    @app.errorhandler(500)
-    def internal_error(error):
-        db.session.rollback()
-        return jsonify({"error": "Internal server error"}), 500
-    
-    @jwt.expired_token_loader
-    def expired_token_callback(jwt_header, jwt_payload):
-        return jsonify({"error": "Token has expired"}), 401
-
     # --- Application Context Initializations (DB, Milvus, Models) ---
     with app.app_context():
         # Initialize Database Tables (for dev/first run; use Flask-Migrate in prod)
@@ -88,6 +74,7 @@ def create_app():
                 app.logger.info("Created 'learning_assistant' user.")
             except Exception as e:
                 app.logger.error(f"Failed to create 'learning_assistant' user: {e}", exc_info=True)
+                db.session.rollback()
 
 
         # Initialize Milvus Client and Collection for financial document embeddings
@@ -97,8 +84,9 @@ def create_app():
             milvus_dimension = app.config.get("MILVUS_DIMENSION")
             
             if not all([milvus_db_path, milvus_collection, milvus_dimension]):
-                app.logger.warning("Missing Milvus configuration. RAG features will be disabled.")
-                return app  # Continue without Milvus for basic functionality
+                app.logger.error("Missing Milvus configuration. Check MILVUS_DB_PATH, MILVUS_COLLECTION, MILVUS_DIMENSION in config.py")
+                # Decide if you want to raise an error and prevent startup, or continue with warning
+                raise RuntimeError("Milvus configuration missing.")
                 
             init_milvus_client(
                 db_path=milvus_db_path,
@@ -108,33 +96,20 @@ def create_app():
             app.logger.info("Milvus client initialized successfully.")
         except Exception as e:
             app.logger.error(f"Failed to initialize Milvus client: {e}", exc_info=True)
-            app.logger.warning("Continuing without RAG capabilities")
+            # Depending on criticality, you might want to re-raise or sys.exit(1)
 
         # Initialize Embedding Model
         try:
             embed_model_name = app.config.get("EMBED_MODEL_NAME")
-            if embed_model_name:
-                init_embed_model(model_name=embed_model_name)
-                app.logger.info("Embedding model initialized successfully.")
-            else:
-                app.logger.warning("No embedding model configured")
+            if not embed_model_name:
+                app.logger.error("Missing Embedding Model configuration (EMBED_MODEL_NAME).")
+                raise RuntimeError("Embedding Model configuration missing.")
+            init_embed_model(model_name=embed_model_name)
+            app.logger.info("Embedding model initialized successfully.")
         except Exception as e:
             app.logger.error(f"Failed to initialize embedding model: {e}", exc_info=True)
 
-        # Initialize Llama Model
-        try:
-            llama_model_path = app.config.get("LLAMA_MODEL_PATH")
-            if llama_model_path:
-                init_llama_model(
-                    model_path=llama_model_path,
-                    n_ctx=app.config.get("LLAMA_N_CTX", 4096),
-                    n_gpu_layers=app.config.get("LLAMA_N_GPU_LAYERS", 0)
-                )
-                app.logger.info("Llama model initialized successfully.")
-            else:
-                app.logger.warning("LLAMA_MODEL_PATH not configured. Using fallback responses.")
-        except Exception as e:
-            app.logger.error(f"Failed to initialize Llama model: {e}", exc_info=True)
-            app.logger.warning("Continuing with limited AI capabilities")
-
+        # Llama Model - using lazy loading to prevent segfault
+        app.logger.info("Llama model will be loaded on first use (lazy loading).")
+        
     return app
