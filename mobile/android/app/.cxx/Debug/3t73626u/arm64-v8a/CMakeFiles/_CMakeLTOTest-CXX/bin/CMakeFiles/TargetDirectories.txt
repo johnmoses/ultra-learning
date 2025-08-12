@@ -1,0 +1,4 @@
+/Users/johnmoses/Workspace/ultra-learning/mobile/android/app/.cxx/Debug/3t73626u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/foo.dir
+/Users/johnmoses/Workspace/ultra-learning/mobile/android/app/.cxx/Debug/3t73626u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/boo.dir
+/Users/johnmoses/Workspace/ultra-learning/mobile/android/app/.cxx/Debug/3t73626u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/edit_cache.dir
+/Users/johnmoses/Workspace/ultra-learning/mobile/android/app/.cxx/Debug/3t73626u/arm64-v8a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/rebuild_cache.dir

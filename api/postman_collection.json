@@ -1,0 +1,679 @@
+{
+	"info": {
+		"name": "UltraLearning API",
+		"description": "Complete test collection for UltraLearning educational platform",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5001/api"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "user_id",
+			"value": ""
+		},
+		{
+			"key": "pack_id",
+			"value": ""
+		},
+		{
+			"key": "room_id",
+			"value": ""
+		}
+	],
+	"item": [
+		{
+			"name": "🏥 System Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						}
+					}
+				},
+				{
+					"name": "Version Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/version",
+							"host": ["{{base_url}}"],
+							"path": ["version"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('user_id', response.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@ultralearning.com\",\n    \"password\": \"testpass123\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', response.access_token);",
+									"    pm.collectionVariables.set('user_id', response.user.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📚 Learning",
+			"item": [
+				{
+					"name": "Create Flashcard Pack",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('pack_id', response.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Python Basics\",\n    \"description\": \"Fundamental Python concepts\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/learning/packs",
+							"host": ["{{base_url}}"],
+							"path": ["learning", "packs"]
+						}
+					}
+				},
+				{
+					"name": "Get Flashcard Packs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/learning/packs",
+							"host": ["{{base_url}}"],
+							"path": ["learning", "packs"]
+						}
+					}
+				},
+				{
+					"name": "Create Flashcard",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"question\": \"What is a Python list?\",\n    \"answer\": \"A Python list is an ordered collection of items that can be changed\",\n    \"pack_id\": {{pack_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/learning/flashcards",
+							"host": ["{{base_url}}"],
+							"path": ["learning", "flashcards"]
+						}
+					}
+				},
+				{
+					"name": "Get Flashcards",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/learning/flashcards?pack_id={{pack_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["learning", "flashcards"],
+							"query": [
+								{
+									"key": "pack_id",
+									"value": "{{pack_id}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Generate Flashcards (LLM)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"llm\",\n    \"pack_id\": {{pack_id}},\n    \"topic\": \"Python functions\",\n    \"num_cards\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/learning/generate",
+							"host": ["{{base_url}}"],
+							"path": ["learning", "generate"]
+						}
+					}
+				},
+				{
+					"name": "Log Study Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"duration\": 45,\n    \"subject\": \"Python Programming\",\n    \"completed\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/learning/sessions",
+							"host": ["{{base_url}}"],
+							"path": ["learning", "sessions"]
+						}
+					}
+				},
+				{
+					"name": "Get Recommendations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/learning/recommendations",
+							"host": ["{{base_url}}"],
+							"path": ["learning", "recommendations"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🎮 Engagement",
+			"item": [
+				{
+					"name": "Get User Score",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/engagement/score",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "score"]
+						}
+					}
+				},
+				{
+					"name": "Add Points",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"points\": 50\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/engagement/add-points",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "add-points"]
+						}
+					}
+				},
+				{
+					"name": "Get Badges",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/engagement/badges",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "badges"]
+						}
+					}
+				},
+				{
+					"name": "Get Progress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/engagement/progress",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "progress"]
+						}
+					}
+				},
+				{
+					"name": "Update Progress",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_level\": \"Intermediate\",\n    \"completed_lessons\": [1, 2, 3, 4]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/engagement/progress",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "progress"]
+						}
+					}
+				},
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/engagement/notifications",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "notifications"]
+						}
+					}
+				},
+				{
+					"name": "Get Streak",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/engagement/streak",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "streak"]
+						}
+					}
+				},
+				{
+					"name": "Get Achievements",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/engagement/achievements",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "achievements"]
+						}
+					}
+				},
+				{
+					"name": "Get Leaderboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/engagement/leaderboard",
+							"host": ["{{base_url}}"],
+							"path": ["engagement", "leaderboard"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🤖 Chat",
+			"item": [
+				{
+					"name": "Create Chat Room",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('room_id', response.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Python Study Room\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/chat/rooms",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms"]
+						}
+					}
+				},
+				{
+					"name": "List Chat Rooms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/chat/rooms",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms"]
+						}
+					}
+				},
+				{
+					"name": "Send Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Hello, I need help with Python functions\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/chat/rooms/{{room_id}}/messages",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms", "{{room_id}}", "messages"]
+						}
+					}
+				},
+				{
+					"name": "Get Room Messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/chat/rooms/{{room_id}}/messages",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms", "{{room_id}}", "messages"]
+						}
+					}
+				},
+				{
+					"name": "Post Message with AI Reply",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Explain Python decorators\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/chat/rooms/{{room_id}}/post_message",
+							"host": ["{{base_url}}"],
+							"path": ["chat", "rooms", "{{room_id}}", "post_message"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 Dashboard",
+			"item": [
+				{
+					"name": "Track Activity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"activity_type\": \"page_view\",\n    \"page_url\": \"/flashcards\",\n    \"session_id\": \"session_123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/dashboard/track",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "track"]
+						}
+					}
+				},
+				{
+					"name": "Track Button Click",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"activity_type\": \"button_click\",\n    \"element_id\": \"create-flashcard-btn\",\n    \"page_url\": \"/flashcards\",\n    \"metadata\": {\"pack_id\": {{pack_id}}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/dashboard/track",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "track"]
+						}
+					}
+				},
+				{
+					"name": "Create Study Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subject\": \"Mathematics\",\n    \"duration_minutes\": 60,\n    \"flashcards_reviewed\": 25,\n    \"correct_answers\": 20,\n    \"completed\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/dashboard/sessions",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "sessions"]
+						}
+					}
+				},
+				{
+					"name": "Get User Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard/user-dashboard",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "user-dashboard"]
+						}
+					}
+				},
+				{
+					"name": "Get Dashboard Overview",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard/overview",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "overview"]
+						}
+					}
+				},
+				{
+					"name": "Get Learning Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/dashboard/summary?period=week",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "summary"],
+							"query": [
+								{
+									"key": "period",
+									"value": "week"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Generate Flashcards (RAG)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"source_type\": \"llm\",\n    \"topic\": \"Machine Learning basics\",\n    \"num_cards\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/dashboard/generate-flashcards",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "generate-flashcards"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
